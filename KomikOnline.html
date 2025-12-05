@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POST KOMIK</title>
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; }
+
+    /* MODE TERANG (default) */
+    :root {
+      --bg-body: #f5f5f5;
+      --bg-card: #ffffff;
+      --bg-banner: rgba(0,0,0,0.55);
+      --text-main: #111111;
+      --text-sub: #555555;
+      --border-soft: #dddddd;
+      --accent: #00c8ff;
+      --header-bg: #000000;
+    }
+
+    /* MODE GELAP */
+    body.dark {
+      --bg-body: #050711;
+      --bg-card: #111320;
+      --bg-banner: rgba(0,0,0,0.75);
+      --text-main: #f5f7ff;
+      --text-sub: #c3c7e5;
+      --border-soft: #252842;
+      --accent: #00e0ff;
+      --header-bg: #020308;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: var(--bg-body) url("house.jpg") no-repeat center top fixed;
+      background-size: cover;
+      color: var(--text-main);
+    }
+
+    /* OVERLAY AGAR TEKS JELAS DI ATAS BACKGROUND */
+    .page-overlay {
+      background: linear-gradient(to bottom, rgba(0,0,0,0.65) 0, rgba(0,0,0,0.35) 200px, rgba(0,0,0,0.0) 400px);
+      min-height: 100vh;
+    }
+
+    /* HEADER + NAV */
+    header {
+      background: var(--header-bg);
+      color:#ffffff;
+      padding:10px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 2px 8px rgba(0,0,0,0.6);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    header .logo {
+      font-weight:bold;
+      font-size:24px;
+      letter-spacing:1px;
+    }
+
+    nav a {
+      color:#ffffff;
+      text-decoration:none;
+      margin-left:20px;
+      font-weight:500;
+      position:relative;
+    }
+    nav a::after {
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:-3px;
+      width:0;
+      height:2px;
+      background:var(--accent);
+      transition:width 0.2s;
+    }
+    nav a:hover::after { width:100%; }
+
+    /* TOMBOL MODE */
+    .mode-toggle {
+      margin-left:20px;
+      padding:5px 12px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.4);
+      background:transparent;
+      color:#ffffff;
+      cursor:pointer;
+      font-size:12px;
+    }
+
+    /* WRAPPER */
+    .container {
+      max-width:1100px;
+      margin:20px auto;
+      display:flex;
+      gap:20px;
+      padding:0 10px 30px;
+    }
+
+    /* KONTEN KIRI */
+    .main-content { flex:3; }
+
+    .banner {
+      background: var(--bg-banner);
+      color:#ffffff;
+      padding:25px 20px;
+      margin-bottom:20px;
+      text-align:center;
+      border:1px solid rgba(255,255,255,0.25);
+      border-radius:8px;
+      backdrop-filter: blur(6px);
+    }
+    .banner h1{
+      font-size:26px;
+      margin-bottom:8px;
+    }
+    .banner p{
+      font-size:14px;
+      color:#e2e4ff;
+    }
+
+    .section-title {
+      font-weight:bold;
+      margin:10px 0 8px;
+      font-size:16px;
+      color:var(--text-main);
+    }
+
+    .manga-row {
+      display:flex;
+      gap:10px;
+      margin-bottom:20px;
+    }
+
+    .manga-card {
+      flex:1;
+      background:var(--bg-card);
+      border:1px solid var(--border-soft);
+      text-align:center;
+      padding:5px;
+      font-size:12px;
+      border-radius:6px;
+      box-shadow:0 2px 4px rgba(0,0,0,0.08);
+      overflow:hidden;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .manga-card:hover{
+      transform:translateY(-3px);
+      box-shadow:0 6px 14px rgba(0,0,0,0.25);
+    }
+
+    .manga-card a{
+      display:block;
+      text-decoration:none;
+      color:var(--text-main);
+    }
+    .manga-card img {
+      width:100%;
+      display:block;
+      border-radius:4px;
+    }
+
+    .manga-card div{
+      margin-top:6px;
+      font-weight:bold;
+    }
+
+    .post {
+      background:var(--bg-card);
+      border:1px solid var(--border-soft);
+      padding:10px;
+      margin-bottom:15px;
+      display:flex;
+      gap:10px;
+      border-radius:6px;
+      box-shadow:0 2px 4px rgba(0,0,0,0.08);
+    }
+    .post img { width:140px; object-fit:cover; border-radius:4px; }
+    .post-title { font-weight:bold; margin-bottom:5px; color:var(--accent); }
+
+    /* SIDEBAR KANAN */
+    .sidebar { flex:1; display:flex; flex-direction:column; gap:20px; }
+
+    .box {
+      background:var(--bg-card);
+      border:1px solid var(--border-soft);
+      padding:10px;
+      font-size:13px;
+      border-radius:6px;
+      box-shadow:0 2px 4px rgba(0,0,0,0.08);
+    }
+    .box h3 { margin-bottom:10px; font-size:14px; }
+    .popular-item {
+      display:flex;
+      gap:8px;
+      margin-bottom:8px;
+      align-items:center;
+    }
+    .popular-item img { width:45px; height:45px; object-fit:cover; border-radius:4px; }
+    .popular-item a{
+      color:var(--text-main);
+      text-decoration:none;
+      font-size:13px;
+    }
+    .popular-item a:hover{ text-decoration:underline; }
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      .container { flex-direction:column; }
+      header { flex-wrap:wrap; gap:10px; }
+    }
+  </style>
+</head>
+<body>
+<div class="page-overlay">
+
+<header>
+  <div class="logo">POST KOMIK</div>
+  <nav>
+    <a href="index.html">HOME</a>
+    <a href="pilihan.html">PILIHAN</a>
+    <a href="daftarkomik.html">DAFTAR KOMIK</a>
+  </nav>
+  <button class="mode-toggle" onclick="toggleMode()">Mode Gelap/Terang</button>
+</header>
+
+<div class="container">
+  <!-- KONTEN KIRI -->
+  <div class="main-content">
+    <div class="banner">
+      <h1>Enjoy Your Favorite Manhwa & Manga</h1>
+      <p>Update cepat, tampilan nyaman, dan koleksi komik pilihan setiap hari.</p>
+    </div>
+
+    <div class="section-title">Read Manga English</div>
+    <div class="manga-row">
+      <div class="manga-card">
+        <a href="https://komikindo.ch/komik/846048-eleceed/">
+          <img src="Eleceed.jpg" alt="Eleceed">
+          <div>Eleceed</div>
+        </a>
+      </div>
+      <div class="manga-card">
+        <a href="https://komikindo.ch/komik/435889-the-boxer/">
+          <img src="TheBoxer.jpeg" alt="The Boxer">
+          <div>The Boxer</div>
+        </a>
+      </div>
+      <div class="manga-card">
+        <a href="https://komikindo.ch/komik/179384-solo-leveling/">
+          <img src="SoloLeveling.jpg" alt="Solo Leveling">
+          <div>Solo Leveling</div>
+        </a>
+      </div>
+      <div class="manga-card">
+        <a href="https://komikindo.ch/komik/155895-nano-machine/">
+          <img src="NanoMachine.jpg" alt="Nano Machine">
+          <div>Nano Machine</div>
+        </a>
+      </div>
+    </div>
+
+    <div class="section-title">New Update</div>
+    <div class="post">
+      <img src="Myst.jpg" alt="Myst, Might, Mayhem">
+      <div>
+        <div class="post-title">Myst, Might, Mayhem 21 - 25</div>
+        <p>Jeong, seorang cucu yang hidup dengan bahagia bersama sang kakek, tiba-tiba mendapati kakeknya tewas mengenaskan. Kejadian tragis ini membuatnya membabi buta dan menyadari "kesenangan" yang dirasakannya dari membunuh. Lalu tiba-tiba... Jeong menjadi Mok Gyeongwoon? Apa yang terjadi?!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR KANAN -->
+  <aside class="sidebar">
+    <div class="box">
+      <h3>Followers (1)</h3>
+      <button>Unfollow</button>
+    </div>
+
+    <div class="box">
+      <h3>POSTKOMIK POPULAR</h3>
+      <div class="popular-item">
+        <img src="NTH.jpg" alt="">
+        <div>
+          <a href="https://komikindo.ch/legend-of-the-northern-blade-chapter-1/">The Legend of the Northern Blade Bahasa Indonesia</a>
+        </div>
+      </div>
+      <div class="popular-item">
+        <img src="Mudang.jpg" alt="">
+        <div>
+          <a href="https://komikindo.ch/komik/567155-mudang-association/">The Grand Mudang Saga Bahasa Indonesia</a>
+        </div>
+      </div>
+      <div class="popular-item">
+        <img src="Heavenly.jpg" alt="">
+        <div>
+          <a href="https://komiku.org/manga/reborn-as-the-heavenly-demon/">Heavenly Demon Reborn! Bahasa Indonesia</a>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+</div>
+
+<script>
+  // Simpan preferensi mode di localStorage
+  function applySavedMode() {
+    const saved = localStorage.getItem('theme');
+    if (saved === 'dark') {
+      document.body.classList.add('dark');
+    }
+  }
+  function toggleMode() {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }
+  applySavedMode();
+</script>
+
+</body>
+</html>

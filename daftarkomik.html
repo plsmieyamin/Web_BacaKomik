@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POST KOMIK - Daftar Komik</title>
+
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+
+    /* VARIABEL WARNA MODE TERANG */
+    :root{
+      --bg-body:#f5f5f5;
+      --bg-card:#ffffff;
+      --bg-header:#000000;
+      --text-main:#111111;
+      --text-sub:#666666;
+      --border-soft:#dddddd;
+      --accent:#00c8ff;
+      --accent-soft:#e0f7ff;
+      --tag-bg:#f2f2f2;
+    }
+
+    /* MODE GELAP */
+    body.dark{
+      --bg-body:#050711;
+      --bg-card:#111320;
+      --bg-header:#020308;
+      --text-main:#f5f7ff;
+      --text-sub:#c3c7e5;
+      --border-soft:#252842;
+      --accent:#00e0ff;
+      --accent-soft:#003545;
+      --tag-bg:#1b1e30;
+    }
+
+    body{
+      font-family:Arial, sans-serif;
+      background:var(--bg-body);
+      color:var(--text-main);
+    }
+
+    /* HEADER */
+    header{
+      background:var(--bg-header);
+      color:#fff;
+      padding:10px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 2px 8px rgba(0,0,0,0.6);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    .logo{font-weight:bold;font-size:24px;letter-spacing:1px;}
+
+    nav a{
+      color:#fff;
+      text-decoration:none;
+      margin-left:20px;
+      font-weight:500;
+      position:relative;
+    }
+    nav a::after{
+      content:"";
+      position:absolute;
+      left:0;bottom:-3px;
+      width:0;height:2px;
+      background:var(--accent);
+      transition:width .2s;
+    }
+    nav a:hover::after{width:100%;}
+
+    .mode-toggle{
+      margin-left:20px;
+      padding:6px 14px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.4);
+      background:transparent;
+      color:#fff;
+      cursor:pointer;
+      font-size:12px;
+    }
+
+    /* WRAPPER UTAMA */
+    .container{
+      max-width:1100px;
+      margin:20px auto;
+      padding:0 12px 30px;
+    }
+
+    .page-title{
+      margin-bottom:12px;
+      font-size:22px;
+      font-weight:bold;
+    }
+    .page-subtitle{
+      font-size:13px;
+      color:var(--text-sub);
+      margin-bottom:18px;
+    }
+
+    /* BAR PENCARIAN/FILTER SEDERHANA */
+    .filter-bar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:15px;
+    }
+    .filter-bar input{
+      flex:1;
+      min-width:180px;
+      padding:7px 10px;
+      border-radius:20px;
+      border:1px solid var(--border-soft);
+      font-size:13px;
+      outline:none;
+    }
+    .filter-bar select{
+      padding:7px 10px;
+      border-radius:20px;
+      border:1px solid var(--border-soft);
+      font-size:13px;
+      background:var(--bg-card);
+      color:var(--text-main);
+    }
+
+    /* TABEL LIST KOMIK */
+    .table-wrapper{
+      background:var(--bg-card);
+      border-radius:8px;
+      border:1px solid var(--border-soft);
+      box-shadow:0 2px 4px rgba(0,0,0,0.08);
+      overflow:hidden;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+    }
+    thead{
+      background:var(--accent-soft);
+    }
+    th,td{
+      padding:10px 12px;
+      border-bottom:1px solid var(--border-soft);
+      text-align:left;
+      vertical-align:middle;
+    }
+    th{
+      font-weight:bold;
+      font-size:12px;
+    }
+    tbody tr:hover{
+      background:rgba(0,0,0,0.03);
+    }
+
+    /* kolom gambar */
+    .thumb-col{
+      width:90px;
+    }
+    .thumb-col img{
+      width:70px;
+      height:100px;
+      object-fit:cover;
+      border-radius:4px;
+      display:block;
+    }
+
+    .title-col a{
+      color:var(--text-main);
+      text-decoration:none;
+      font-weight:bold;
+    }
+    .title-col a:hover{ text-decoration:underline; }
+
+    .tag{
+      display:inline-block;
+      padding:3px 7px;
+      font-size:11px;
+      border-radius:12px;
+      background:var(--tag-bg);
+      margin-right:4px;
+      margin-top:3px;
+    }
+
+    .status-ongoing{ color:#00a86b; font-weight:bold; }
+    .status-ended{ color:#c62828; font-weight:bold; }
+
+    @media(max-width:768px){
+      th:nth-child(5), td:nth-child(5){
+        display:none; /* sembunyikan kolom update di layar kecil */
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">POST KOMIK</div>
+  <nav>
+    <a href="index.html">HOME</a>
+    <a href="pilihan.html">REKOMENDASI</a>
+    <a href="daftarkomik.html">DAFTAR KOMIK</a>
+  </nav>
+  <button class="mode-toggle" onclick="toggleMode()">Mode Gelap / Terang</button>
+</header>
+
+<div class="container">
+  <div class="page-title">Daftar Komik</div>
+  <div class="page-subtitle">
+    Semua komik yang tersedia di POST KOMIK. Gunakan pencarian dan filter untuk menemukan bacaan favoritmu.
+  </div>
+
+  <div class="filter-bar">
+    <input type="text" placeholder="Cari judul komik... (contoh: Wind Breaker)">
+    <select>
+      <option>Semua Genre</option>
+      <option>Action</option>
+      <option>Fantasy</option>
+      <option>Romance</option>
+      <option>Thriller</option>
+    </select>
+    <select>
+      <option>Semua Status</option>
+      <option>On Going</option>
+      <option>Tamat</option>
+    </select>
+  </div>
+
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Cover</th>
+          <th>Judul</th>
+          <th>Genre</th>
+          <th>Status</th>
+          <th>Update Terakhir</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ROW 1 -->
+        <tr>
+          <td class="thumb-col">
+            <img src="WIND.jpg" alt="Wind Breaker">
+          </td>
+          <td class="title-col">
+            <a href="https://komiku.org/manga/wind-breaker/">Wind Breaker</a>
+            <div style="font-size:11px;color:var(--text-sub);">
+              Jo "Jay" dan dunia balap sepeda jalanan.
+            </div>
+          </td>
+          <td>
+            <span class="tag">Action</span>
+            <span class="tag">School</span>
+          </td>
+          <td class="status-ongoing">On Going</td>
+          <td>Chapter 556</td>
+        </tr>
+
+        <!-- ROW 2 -->
+        <tr>
+          <td class="thumb-col">
+            <img src="PLAYER.jpg" alt="Player">
+          </td>
+          <td class="title-col">
+            <a href="https://komiku.org/manga/player/">Player</a>
+            <div style="font-size:11px;color:var(--text-sub);">
+              Heo Seol-Jin dan kekuatan misterius dari Merlin.
+            </div>
+          </td>
+          <td>
+            <span class="tag">Action</span>
+            <span class="tag">Fantasy</span>
+          </td>
+          <td class="status-ongoing">On Going</td>
+          <td>Chapter 227</td>
+        </tr>
+
+        <!-- ROW 3 -->
+        <tr>
+          <td class="thumb-col">
+            <img src="BASTARD.jpg" alt="Bastard">
+          </td>
+          <td class="title-col">
+            <a href="https://komikindo.ch/komik/bastard/">Bastard</a>
+            <div style="font-size:11px;color:var(--text-sub);">
+              Anak dari pembunuh berantai yang ingin lepas dari ayahnya.
+            </div>
+          </td>
+          <td>
+            <span class="tag">Thriller</span>
+            <span class="tag">Psychological</span>
+          </td>
+          <td class="status-ended">Tamat</td>
+          <td>Chapter 92.5</td>
+        </tr>
+
+        <!-- ROW 4 -->
+        <tr>
+          <td class="thumb-col">
+            <img src="GOSU.jpg" alt="Gosu">
+          </td>
+          <td class="title-col">
+            <a href="https://komiku.org/manga/gosu/">Gosu</a>
+            <div style="font-size:11px;color:var(--text-sub);">
+              Gang Yong mencari pelaku yang mengkhianati gurunya.
+            </div>
+          </td>
+          <td>
+            <span class="tag">Action</span>
+            <span class="tag">Martial Arts</span>
+          </td>
+          <td class="status-ongoing">On Going</td>
+          <td>Chapter 232</td>
+        </tr>
+
+        <!-- ROW 5 -->
+        <tr>
+          <td class="thumb-col">
+            <img src="TOWER OF GOD.jpg" alt="Tower of God">
+          </td>
+          <td class="title-col">
+            <a href="https://komikindo.ch/komik/767181-tower-of-god/">Tower of God</a>
+            <div style="font-size:11px;color:var(--text-sub);">
+              Perjalanan Bam menaiki menara demi mengejar Rachel.
+            </div>
+          </td>
+          <td>
+            <span class="tag">Fantasy</span>
+            <span class="tag">Adventure</span>
+          </td>
+          <td class="status-ongoing">On Going</td>
+          <td>Chapter 523</td>
+        </tr>
+
+        <!-- Tambah baris lain di sini dengan format yang sama -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  function applySavedMode(){
+    const saved = localStorage.getItem('themeDaftar');
+    if(saved === 'dark'){
+      document.body.classList.add('dark');
+    }
+  }
+  function toggleMode(){
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+        localStorage.setItem('themeDaftar', isDark ? 'dark' : 'light');
+  }
+
+  // panggil saat halaman pertama kali dibuka
+  applySavedMode();
+</script>
+
+</body>
+</html>
+
+
+      

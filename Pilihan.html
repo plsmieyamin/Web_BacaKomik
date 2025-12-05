@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>POST KOMIK - Rekomendasi</title>
+
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+
+    :root{
+      --bg-body:#f5f5f5;
+      --bg-card:#ffffff;
+      --bg-banner:rgba(0,0,0,0.55);
+      --text-main:#111111;
+      --text-sub:#555555;
+      --border-soft:#dddddd;
+      --accent:#ffb300;
+      --accent-soft:#ffe399;
+      --header-bg:#000000;
+      --badge-top:#ff7043;
+    }
+
+    body.dark{
+      --bg-body:#050711;
+      --bg-card:#111320;
+      --bg-banner:rgba(0,0,0,0.8);
+      --text-main:#f5f7ff;
+      --text-sub:#c3c7e5;
+      --border-soft:#252842;
+      --accent:#ffd54f;
+      --accent-soft:#665314;
+      --header-bg:#020308;
+      --badge-top:#ff8a65;
+    }
+
+    body{
+      font-family:Arial, sans-serif;
+      background:var(--bg-body) url("whatdoes.jpg") no-repeat center top fixed;
+      background-size:cover;
+      color:var(--text-main);
+    }
+
+    .page-overlay{
+      min-height:100vh;
+      background:linear-gradient(to bottom,
+               rgba(0,0,0,0.7) 0,
+               rgba(0,0,0,0.35) 220px,
+               rgba(0,0,0,0.0) 420px);
+    }
+
+    header{
+      background:var(--header-bg);
+      color:#fff;
+      padding:10px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      box-shadow:0 2px 8px rgba(0,0,0,0.6);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    .logo{font-weight:bold;font-size:24px;letter-spacing:1px;}
+
+    nav a{
+      color:#fff;
+      text-decoration:none;
+      margin-left:20px;
+      font-weight:500;
+      position:relative;
+    }
+    nav a::after{
+      content:"";
+      position:absolute;
+      left:0;bottom:-3px;
+      width:0;height:2px;
+      background:var(--accent);
+      transition:width .2s;
+    }
+    nav a:hover::after{width:100%;}
+
+    .mode-toggle{
+      margin-left:20px;
+      padding:6px 14px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,0.4);
+      background:transparent;
+      color:#fff;
+      cursor:pointer;
+      font-size:12px;
+    }
+
+    .container{
+      max-width:1100px;
+      margin:20px auto;
+      display:flex;
+      gap:20px;
+      padding:0 10px 30px;
+    }
+
+    .main-content{flex:3;}
+
+    .banner{
+      background:var(--bg-banner);
+      color:#fff;
+      padding:22px 18px;
+      margin-bottom:20px;
+      border-radius:8px;
+      border:1px solid rgba(255,255,255,0.25);
+      backdrop-filter:blur(6px);
+    }
+    .banner h1{font-size:24px;margin-bottom:6px;}
+    .banner p{font-size:14px;color:#ffe9b3;}
+
+    .section-title{
+      font-weight:bold;
+      margin:10px 0 8px;
+      font-size:16px;
+    }
+
+    /* KARTU REKOMENDASI */
+    .list-wrapper{
+      background:var(--bg-card);
+      padding:15px;
+      border:1px solid var(--border-soft);
+      border-radius:8px;
+      box-shadow:0 2px 4px rgba(0,0,0,0.08);
+    }
+
+    .rec-item{
+      display:flex;
+      gap:15px;
+      padding:15px 0;
+      border-bottom:1px solid var(--border-soft);
+    }
+    .rec-item:last-child{border-bottom:none;}
+
+    .rec-rank{
+      width:40px;
+      text-align:center;
+      font-weight:bold;
+      font-size:18px;
+      color:#fff;
+      background:var(--badge-top);
+      border-radius:6px;
+      padding:8px 0;
+    }
+    .rec-rank small{
+      display:block;
+      font-size:10px;
+      text-transform:uppercase;
+    }
+
+    .rec-cover{
+      width:180px;
+      height:120px;
+      object-fit:cover;
+      border-radius:6px;
+    }
+
+    .rec-body{
+      flex:1;
+    }
+
+    .rec-title{
+      font-size:18px;
+      font-weight:bold;
+      margin-bottom:4px;
+    }
+    .rec-title a{
+      color:var(--text-main);
+      text-decoration:none;
+    }
+    .rec-title a:hover{ text-decoration:underline; }
+
+    .rec-meta{
+      font-size:12px;
+      color:var(--text-sub);
+      margin-bottom:6px;
+    }
+
+    .rec-desc{
+      font-size:13px;
+      line-height:1.6;
+      margin-bottom:8px;
+      color:var(--text-sub);
+    }
+
+    .rec-tags span{
+      display:inline-block;
+      font-size:11px;
+      padding:3px 7px;
+      border-radius:12px;
+      background:var(--accent-soft);
+      color:#000;
+      margin-right:4px;
+      margin-top:3px;
+    }
+
+    .rec-score{
+      font-size:13px;
+      font-weight:bold;
+      color:var(--accent);
+      margin-top:6px;
+    }
+
+    /* SIDEBAR */
+    .sidebar{flex:1;display:flex;flex-direction:column;gap:20px;}
+
+    .box{
+      background:var(--bg-card);
+      border:1px solid var(--border-soft);
+      padding:10px;
+      font-size:13px;
+      border-radius:6px;
+      box-shadow:0 2px 4px rgba(0,0,0,0.08);
+    }
+    .box h3{margin-bottom:10px;font-size:14px;}
+
+    .popular-item{
+      display:flex;
+      gap:8px;
+      margin-bottom:8px;
+      align-items:center;
+    }
+    .popular-item img{
+      width:45px;height:45px;object-fit:cover;border-radius:4px;
+    }
+    .popular-item a{
+      color:var(--text-main);
+      text-decoration:none;
+      font-size:13px;
+    }
+    .popular-item a:hover{text-decoration:underline;}
+
+    @media(max-width:768px){
+      .container{flex-direction:column;}
+      header{flex-wrap:wrap;gap:8px;}
+      .rec-item{flex-wrap:wrap;}
+      .rec-cover{width:100%;height:180px;}
+    }
+  </style>
+</head>
+<body>
+<div class="page-overlay">
+
+<header>
+  <div class="logo">POST KOMIK</div>
+  <nav>
+    <a href="index.html">HOME</a>
+    <a href="pilihan.html">REKOMENDASI</a>
+    <a href="daftarkomik.html">DAFTAR KOMIK</a>
+  </nav>
+  <button class="mode-toggle" onclick="toggleMode()">Mode Gelap / Terang</button>
+</header>
+
+<div class="container">
+  <div class="main-content">
+    <div class="banner">
+      <h1>Rekomendasi Komik Minggu Ini</h1>
+      <p>Dipilih berdasarkan rating pembaca, popularitas, dan cerita yang bikin nagih.</p>
+    </div>
+
+    <div class="section-title">Top Rekomendasi</div>
+    <div class="list-wrapper">
+
+      <!-- REKOMENDASI 1 -->
+      <div class="rec-item">
+        <div class="rec-rank">1<small>Top</small></div>
+        <img src="WIND.jpg" class="rec-cover" alt="Wind Breaker">
+        <div class="rec-body">
+          <div class="rec-title">
+            <a href="#">Wind Breaker</a>
+          </div>
+          <div class="rec-meta">141rb pembaca · Action · Berwarna</div>
+          <p class="rec-desc">
+            Jo "Jay" Ja-Hyun, ketua OSIS yang sempurna, diam-diam adalah pembalap sepeda jalanan dengan skill gila.
+            Pertemuan dengan kru balap membuat hidup belajarnya berubah jadi penuh adrenalin.
+          </p>
+          <div class="rec-tags">
+            <span>School</span><span>Sports</span><span>Friendship</span>
+          </div>
+          <div class="rec-score">Rating pembaca: 9.1 / 10</div>
+        </div>
+      </div>
+
+      <!-- REKOMENDASI 2 -->
+      <div class="rec-item">
+        <div class="rec-rank">2<small>Top</small></div>
+        <img src="PLAYER.jpg" class="rec-cover" alt="Player">
+        <div class="rec-body">
+          <div class="rec-title">
+            <a href="#">Player</a>
+          </div>
+          <div class="rec-meta">222rb pembaca · Action · Fantasy</div>
+          <p class="rec-desc">
+            Heo Seol-Jin tiba-tiba bisa melihat jiwa orang dan memperoleh tubuh super cepat.
+            Kekuatannya menyeret dia ke dunia pertarungan dan misteri baru yang berbahaya.
+          </p>
+          <div class="rec-tags">
+            <span>System</span><span>Modern Fantasy</span>
+          </div>
+          <div class="rec-score">Rating pembaca: 8.7 / 10</div>
+        </div>
+      </div>
+
+      <!-- REKOMENDASI 3 -->
+      <div class="rec-item">
+        <div class="rec-rank">3<small>Top</small></div>
+        <img src="BASTARD.jpg" class="rec-cover" alt="Bastard">
+        <div class="rec-body">
+          <div class="rec-title">
+            <a href="#">Bastard</a>
+          </div>
+          <div class="rec-meta">134rb pembaca · Thriller · Berwarna</div>
+          <p class="rec-desc">
+            Seon Jin hidup dalam teror karena ayahnya sendiri adalah pembunuh berantai.
+            Saat seorang siswi baru menjadi target berikutnya, Jin harus memilih: ikut atau melawan.
+          </p>
+          <div class="rec-tags">
+            <span>Psychological</span><span>Thriller</span>
+          </div>
+          <div class="rec-score">Rating pembaca: 9.3 / 10</div>
+        </div>
+      </div>
+
+      <!-- REKOMENDASI 4 -->
+      <div class="rec-item">
+        <div class="rec-rank">4<small>Top</small></div>
+        <img src="GOSU.jpg" class="rec-cover" alt="Gosu">
+        <div class="rec-body">
+          <div class="rec-title">
+            <a href="#">Gosu</a>
+          </div>
+          <div class="rec-meta">149rb pembaca · Martial Arts</div>
+          <p class="rec-desc">
+            Setelah gurunya dikhianati dan dibunuh, Gang Yong berlatih seni bela diri secara diam-diam untuk balas dendam.
+            Namun musuh-musuhnya ternyata sudah lebih dulu tumbang.
+          </p>
+          <div class="rec-tags">
+            <span>Action</span><span>Murim</span>
+          </div>
+          <div class="rec-score">Rating pembaca: 8.9 / 10</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="box">
+      <h3>Filter Cepat</h3>
+      <p style="font-size:13px;color:var(--text-sub);">
+        Cari rekomendasi sesuai selera kamu:
+      </p>
+      <ul style="margin-top:6px;font-size:13px;color:var(--text-sub);list-style:disc;padding-left:18px;">
+        <li>Action & Adventure</li>
+        <li>Romance & Slice of Life</li>
+        <li>Thriller & Horror</li>
+      </ul>
+    </div>
+
+    <div class="box">
+      <h3>Populer Minggu Ini</h3>
+      <div class="popular-item">
+        <img src="NTH.jpg" alt="">
+        <div>
+          <a href="#">The Legend of the Northern Blade</a>
+        </div>
+      </div>
+      <div class="popular-item">
+        <img src="Mudang.jpg" alt="">
+        <div>
+          <a href="#">The Grand Mudang Saga</a>
+        </div>
+      </div>
+      <div class="popular-item">
+        <img src="Heavenly.jpg" alt="">
+        <div>
+          <a href="#">Heavenly Demon Reborn!</a>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+</div>
+
+<script>
+  function applySavedMode(){
+    const saved = localStorage.getItem('themeRekomendasi');
+    if(saved === 'dark'){ document.body.classList.add('dark'); }
+  }
+  function toggleMode(){
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('themeRekomendasi', isDark ? 'dark' : 'light');
+  }
+  applySavedMode();
+</script>
+
+</body>
+</html>
